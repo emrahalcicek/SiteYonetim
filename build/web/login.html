@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-neptune/resources/theme-neptune-all.css" 
+              rel = "stylesheet" />
+        <script type = "text/javascript" 
+        src = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+        <script type="text/javascript">
+
+
+
+            Ext.onReady(function () {
+
+                Ext.create('Ext.form.Panel', {
+                    renderTo: Ext.getBody(),
+                    title: 'Kullanıcı Girişi',
+                    id: 'kullanici_form',
+                    width: 400,
+                    height: 300,
+                    x: 700,
+                    y: 300,
+                    // style: "background-image:url('/images/giris.jpg')",
+//                    style: {
+//                       // background: '#ffffff',
+//                        backgroundImage: 'url(./image/giris.jpg)',
+//                        backgroundSize: '10% 10%',
+//                        backgroundRepeat: 'no-repeat',
+//                       // backgroundPosition: 'bottom left',
+//                    },
+                    layout: 'absolute', // konum kesin
+                    items: [
+
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'Kullanıcı Adı:',
+                            emptyText: 'Kullanıcı Adınız',
+                            name: 'kullanici_adi',
+                            labelStyle: 'color: #0000cd; font-weight: bold; font-size: 14px',
+                            x: 40,
+                            y: 50
+
+                        },
+                        {
+                            xtype: 'textfield',
+                            inputType: 'password',
+                            fieldLabel: 'Parola:',
+                            emptyText: 'Parolanız',
+                            labelStyle: 'color: #0000cd; font-weight: bold; font-size: 14px',
+                            name: 'parola',
+                            required: true,
+                            x: 40,
+                            y: 80
+                        },
+
+                        {
+                            xtype: 'button',
+                            text: 'Giriş Yap',
+                            //style:'$font-size:0px',
+                            x: 300,
+                            y: 200,
+                            witdh: 'auto',
+                            listeners: {//Implement listener
+                                click: function () {
+                                    var form = Ext.getCmp('kullanici_form');
+                                    var values = form.getValues(); //get values from form id
+                                    //    console.log(values);
+                                    Ext.Ajax.request({
+                                        url: 'http://localhost:8080/SiteYonetim/rest/service/kullanicigirisi', //Defined path of function defined in MVC 
+                                        method: 'POST',
+                                        params: {
+                                            kullanici_adi: values.kullanici_adi, //Bind values with database table field
+                                            parola: values.parola
+                                        },
+                                        success: function () {
+                                            // alert('Kayit Başarılı');
+                                            window.location = "./index.html";
+                                        },
+                                        failure: function () {
+                                            alert('Kullanıcı adı ve parola hatalı!');
+                                        }
+
+                                    });
+                                }
+                            }
+
+                        }
+
+                    ]
+
+                });
+
+            });
+
+        </script>
+    </head>
+    <body>
+        <div></div>
+    </body>
+</html>

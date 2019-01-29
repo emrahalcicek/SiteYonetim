@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-neptune/resources/theme-neptune-all.css" 
+              rel = "stylesheet" />
+        <script type = "text/javascript" 
+        src = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+        <script type = "text/javascript" 
+        src = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/locale/locale-tr.js"></script>
+        <script type="text/javascript">
+
+
+
+            Ext.onReady(function () {
+
+
+
+
+                var oturan_tur = [];
+
+                //create extjs store with empty data
+                var oturanStore = Ext.create('Ext.data.Store', {
+                    fields: ['id', 'oturan_tur'],
+                    data: oturan_tur,
+                    paging: false
+                });
+
+
+                Ext.Ajax.request({
+
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/oturanturgetir',
+                    success: function (r) {
+
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+
+//                        console.log(jsonResp);
+
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            oturan_tur.push({'id': jsonResp[i].oturan_turu_id, 'oturan_tur': jsonResp[i].oturan_tur}); ////////  !!!!!!!!!!!!
+                        }
+
+                        oturanStore.loadData(oturan_tur);
+
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+
+// blok getir
+
+                var blok = [];
+
+                //create extjs store with empty data
+                var blokStore = Ext.create('Ext.data.Store', {
+                    fields: ['id', 'blok_ad'],
+                    data: blok,
+                    paging: false
+                });
+
+
+                Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/blokgetir',
+                    success: function (r) {
+
+
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+
+//                        console.log(jsonResp);
+
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            blok.push({'id': jsonResp[i].blok_id, 'blok_ad': jsonResp[i].blok_ad}); ////////  !!!!!!!!!!!!
+                        }
+
+                        blokStore.loadData(blok);
+
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+
+// DaireNo Getir
+
+                var daire = [];
+
+                //create extjs store with empty data
+                var daireStore = Ext.create('Ext.data.Store', {
+                    fields: ['id', 'daire_numarasi'],
+                    data: daire,
+                    paging: false
+                });
+
+
+                Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/dairegetir',
+                    success: function (r) {
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+
+//                        console.log(jsonResp);
+
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            daire.push({'id': jsonResp[i].daire_id, 'daire_numarasi': jsonResp[i].daire_numarasi}); ////////  !!!!!!!!!!!!
+                        }
+
+                        daireStore.loadData(daire);
+
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+                
+          //kullanıcı getir
+                     Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/getKullanici',
+                    success: function (r) {  
+                         console.log(r.responseText);
+                        Ext.getCmp('kullanici').setText(r.responseText);
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+
+
+// site sakinleri kaydet
+                var form_site_sakinleri = Ext.create('Ext.form.Panel', {
+                    id: 'sitesakinleri',
+                    border: true,
+                    width: 'auto',
+                    title: 'SİTE SAKİNLERİ',
+                    items: [
+                        {
+                            xtype: 'hiddenfield',
+                            name: 'oturan_id',
+                            id: 'oturan_id',
+                            width: 350,
+                            margin: '5 0 0 5'
+                        },
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'ADI:',
+                            name: 'adi',
+                            id: 'adi',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            maskRe:/[^@#$%&*0-9^]/ //alfabetik karakter
+                        },
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'SOYADI:',
+                            name: 'soyad',
+                            id: 'soyad',
+                            width: 350,
+                            margin: '5 0 5 5'
+                        },
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'TELEFON:',
+                            name: 'telefon_no',
+                            id: 'telefon_no',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            allowNegative: false,
+                            allowDecimals: false,
+                            // allowBlank: false,
+                            maskRe: /[0-9]/,
+                            validator: function (v) {
+                                return /^-?[0-9]*(\.[0-9]{1,2})?$/.test(v) ? true : '';
+                            }
+                        }, {
+                            xtype: 'combobox',
+                            fieldLabel: 'OTURAN TÜRÜ:',
+                            name: 'oturan_turu',
+                            id: 'oturan_turu',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            queryMode: 'local',
+                            store: oturanStore,
+                            displayField: 'oturan_tur', // get-set alanında geliyor
+                            valueField: 'id' // 
+
+                        },
+                        {
+                            xtype: 'combobox',
+                            fieldLabel: 'BLOK ADI',
+                            name: 'blokad',
+                            id: 'blokad',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            queryMode: 'local',
+                            store: blokStore,
+                            displayField: 'blok_ad', // get-set alanında geliyor
+                            valueField: 'id',
+                            typeAhead: true,
+                            forceSelection: true,
+                            allowBlank: false,
+                            editable: true,
+                            // triggerAction: 'all'  //combox benzer isimlerde arama işlemi
+//                            listeners: {
+//                                select: {fn: function (combo, value) {
+//                                        var sample = Ext.getCmp('daire_numarasi');
+//                                        sample.store.clearFilter();
+//                                        sample.store.filter('id', combo.getValue());
+//                                        sample.clearValue();
+//                                    }}
+//                            }
+                        },
+                        {
+                            xtype: 'combobox',
+                            fieldLabel: 'DAİRE NUMARASI',
+                            name: 'daire_numarasi',
+                            id: 'daire_numarasi',
+                            queryMode: 'local',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            store: daireStore,
+                            displayField: 'daire_numarasi', // get-set alanında geliyor
+                            valueField: 'id',
+                            typeAhead: true,
+                            forceSelection: true,
+                            allowBlank: false,
+                            editable: true,
+                            triggerAction: 'all',
+                            lastQuery: ''
+                        },
+                        {
+                            xtype: 'button',
+                            text: 'Ekle',
+                            id: 'site_sakinleri_ekle',
+                            width: 100,
+                            margin: '5 0 5 5',
+                            listeners: {//Implement listener
+                                click: function () {
+                                    var form = Ext.getCmp('sitesakinleri');
+                                    var values = form.getValues(); //get values from form id
+                                    console.log(values);
+                                    Ext.Ajax.request({
+                                        url: 'http://localhost:8080/SiteYonetim/rest/service/siteSakinlerikaydet', //Defined path of function defined in MVC 
+                                        method: 'POST',
+                                        params: {
+                                            adi: values.adi, // sağdaki değişken input name veya id ile aynı olmalı soldaki isim form param ile aynı olmalı
+                                            soyad: values.soyad,
+                                            telefon_no: values.telefon_no,
+                                            oturan_turu: values.oturan_turu,
+                                            blokad: values.blokad,
+                                            daire_numarasi: values.daire_numarasi
+                                        },
+                                        success: function () {
+                                            alert('Kayit Başarılı');
+                                            location.reload();
+                                        },
+                                        failure: function () {
+                                            alert('Veri tabanına bağlanılmadı');
+                                        }
+
+                                    });
+                                }
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            text: 'Güncelle',
+                            id: 'oturan_guncelle',
+                            width: 100,
+                            margin: '5 0 5 5',
+                            listeners: {//Implement listener
+                                click: function () {
+                                    var form = Ext.getCmp('sitesakinleri');
+                                    var values = form.getValues(); //get values from form id
+                                    console.log(values);
+                                    Ext.Ajax.request({
+                                        url: 'http://localhost:8080/SiteYonetim/rest/service/siteSakinleriGuncelle', //Defined path of function defined in MVC 
+                                        method: 'POST',
+                                        params: {
+                                            oturan_id: values.oturan_id,
+                                            adi: values.adi, // sağdaki değişken input name veya id ile aynı olmalı soldaki isim form param ile aynı olmalı
+                                            soyad: values.soyad,
+                                            telefon_no: values.telefon_no,
+                                            oturan_turu: values.oturan_turu,
+                                            blokad: values.blokad,
+                                            daire_numarasi: values.daire_numarasi
+                                        },
+                                        success: function () {
+                                            alert('Kayit Başarılı');
+                                            location.reload();
+                                        },
+                                        failure: function () {
+                                            alert('Veri tabanına bağlanılmadı');
+                                        }
+
+                                    });
+                                }
+                            }
+                        }
+                    ]
+
+                });
+
+// site sakinleri grid
+
+                var records = [];
+                //create extjs store with empty data
+                var store = Ext.create('Ext.data.Store', {
+                    fields: ['oturan_id', 'oturan_ad', 'oturan_soyad', 'oturan_telefon', 'oturan_tur', 'blok_ad', 'daire_numarasi'],
+                    data: records,
+                    paging: false
+                });
+                Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/sitesakinlerigetir',
+                    success: function (r) {
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            records.push({'oturan_id': jsonResp[i].oturan_id, 'oturan_ad': jsonResp[i].oturan_ad, 'oturan_soyad': jsonResp[i].oturan_soyad, 'oturan_telefon': jsonResp[i].oturan_telefon, 'oturan_tur': jsonResp[i].oturan_tur, 'blok_ad': jsonResp[i].blok_ad, 'daire_numarasi': jsonResp[i].daire_numarasi});
+                        }
+
+                        store.loadData(records);
+                    },
+                    failure: function (r) {
+
+                    }
+                });
+                var gridStore = Ext.create('Ext.grid.Panel', {
+                    id: 'gridId',
+                    //renderTo: Ext.getBody(),
+                    store: store,
+                    stripeRows: true,
+                    title: 'Site Sakinleri',
+                    width: 'auto',
+                    // collapsible: true,
+                    enableColumnMove: true,
+                    enableColumnResize: true,
+                    //layout: 'fit',
+                    autoScroll: true,
+                    reserveScrollbar: true,
+                    columns:
+                            [
+
+                                {
+                                    header: "Adı",
+                                    dataIndex: 'oturan_ad',
+                                    id: 'o_adi',
+                                    flex: .2,
+                                    sortable: true,
+                                    hideable: true
+                                }, {
+                                    header: "Soyad",
+                                    dataIndex: 'oturan_soyad',
+                                    id: 'o_soyadi',
+                                    flex: .5,
+                                    sortable: true,
+                                    hideable: false
+                                }, {
+                                    header: "Telefon",
+                                    dataIndex: 'oturan_telefon',
+                                    id: 'o_telefon',
+                                    flex: .5,
+                                    sortable: true
+                                }, {
+                                    header: "Oturan Türü",
+                                    dataIndex: 'oturan_tur',
+                                    id: 'o_turu',
+                                    flex: .5,
+                                    sortable: true
+                                }, {
+                                    header: "Blok Adı",
+                                    dataIndex: 'blok_ad',
+                                    id: 'o_blokadi',
+                                    flex: .5,
+                                    sortable: true
+                                }, {
+                                    header: "Daire Numarası",
+                                    dataIndex: 'daire_numarasi',
+                                    id: 'o_daireno',
+                                    flex: .5,
+                                    sortable: true
+                                }
+                            ],
+                    listeners: {
+                        itemclick: function (dv, record, item, index, e) {
+
+                            Ext.getCmp('adi').setValue(record.get('oturan_ad')); // ilk değer input id ikinci değer dataIndex değeri
+                            Ext.getCmp('soyad').setValue(record.get('oturan_soyad'));
+                            Ext.getCmp('telefon_no').setValue(record.get('oturan_telefon'));
+//                            Ext.getCmp('oturan_turu').setValue(record.get('oturan_tur'));
+//                            Ext.getCmp('blokad').setValue(record.get('blok_ad'));
+//                            Ext.getCmp('daire_numarasi').setValue(record.get('daire_numarasi'));
+                            Ext.getCmp('oturan_id').setValue(record.get('oturan_id')); //işlemi id üzerinden yapıyoruz
+
+
+                            var oturan_Combo = Ext.getCmp('oturan_turu'); /// join li combox olunca bu şekilde veriyi alıyoruz
+                            var oturanstore = oturan_Combo.getStore();
+
+                                   console.log(oturanstore.data.items[0]);
+
+                            for (var i = 0; i < oturanstore.data.items.length; i++) {
+                                if (oturanstore.data.items[i].data.oturan_tur == record.get('oturan_tur')) {
+                                    Ext.getCmp('oturan_turu').setRawValue(record.get('oturan_tur'));
+                                    Ext.getCmp('oturan_turu').setValue(oturanstore.data.items[i].data.id);
+                                }
+                            }
+
+                            var blok_Combo = Ext.getCmp('blokad');
+                            var blokstore = blok_Combo.getStore();
+
+                               //   console.log(blokstore.data.items[0]);
+
+                            for (var i = 0; i < blokstore.data.items.length; i++) {
+                                if (blokstore.data.items[i].data.blok_ad == record.get('blok_ad')) {
+                                    Ext.getCmp('blokad').setRawValue(record.get('blok_ad'));
+                                    Ext.getCmp('blokad').setValue(blokstore.data.items[i].data.id);
+                                }
+                            }
+
+
+                              var daire_Combo = Ext.getCmp('daire_numarasi');
+                            var dairestore = daire_Combo.getStore();
+
+                                  console.log(dairestore.data.items[0]);
+
+                            for (var i = 0; i < dairestore.data.items.length; i++) {
+                                if (dairestore.data.items[i].data.daire_numarasi == record.get('daire_numarasi')) {
+                                    Ext.getCmp('daire_numarasi').setRawValue(record.get('daire_numarasi'));
+                                    Ext.getCmp('daire_numarasi').setValue(dairestore.data.items[i].data.id);
+                                }
+                            }
+
+//                            console.log(record.get('oturan_ad'));
+
+
+
+                        }
+                    },
+
+                    dockedItems: [{
+                            xtype: 'pagingtoolbar',
+                            store: gridStore, // same store GridPanel is using
+                            dock: 'bottom',
+                           // displayInfo: true
+                        }]
+                });
+
+                Ext.create('Ext.panel.Panel', {
+                    layout: 'border',
+                    width: 'auto',
+                    height: 950,
+                    renderTo: Ext.getBody(),
+                    items: [
+                        {
+                            xtype: 'panel',
+                            // html: 'North Panel',
+                            region: 'north',
+                            height: 65,
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    xtype: 'button',
+                                    text: 'ANASAYFA',
+                                    id: 'anasayfa',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./index.html";
+                                    }
+                                }, {
+                                    xtype: 'button',
+                                    text: 'SİTELER',
+                                    id: 'site',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./site.html";
+                                    }
+                                }, {
+                                    xtype: 'button',
+                                    text: 'BLOKLAR',
+                                    id: 'blok',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./blok.html";
+                                    }
+                                }, {
+                                    xtype: 'button',
+                                    text: 'DAİRELER',
+                                    id: 'daire',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./daire.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'SİTE SAKİNLERİ',
+                                    id: 'site_sakinleri',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./sitesakinleri.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'AİDATLAR',
+                                    id: 'aidat',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./aidat.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'KİRALAR',
+                                    id: 'kira',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./kira.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'GÖREVLİLER',
+                                    // id: 'site_gorevli',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./gorevli.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'label',
+                                    margin: '5 15 15 300',
+                                    id: 'kullanici',
+                                    name: 'kullanici'
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'Çıkış',
+                                    margin: '10 15 15 15',
+                                    id: 'cikis',
+                                    name: 'cikis',
+                                    width: 100,
+                                    handler: function cikis() {
+                                        var theUrl = "http://localhost:8080/SiteYonetim/rest/service/cikis";
+                                        var xmlHttp = new XMLHttpRequest();
+                                        xmlHttp.onreadystatechange = function () {
+                                            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                                                window.location="./login.html";
+                                            }
+                                        };
+                                        xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+                                        xmlHttp.send(null);
+                                    }
+
+                                }
+                                
+                            ]
+
+
+                        }, {
+                            xtype: 'panel',
+                            // html: 'Center Panel',
+                            region: 'center',
+                            width: 'auto',
+                            height: 500,
+                            items: [gridStore]
+                        },
+                        {
+                            xtype: 'panel',
+                            // html : 'West Panel',
+                            region: 'west',
+                            border: true,
+                            width: 500,
+                            autoScroll: true,
+                            items: [form_site_sakinleri]
+
+                        }
+                    ]
+                });
+            });
+
+        </script>
+    </head>
+    <body>
+        <div></div>
+    </body>
+</html>

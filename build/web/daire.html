@@ -1,0 +1,564 @@
+
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/theme-neptune/resources/theme-neptune-all.css" 
+              rel = "stylesheet" />
+        <script type = "text/javascript" 
+        src = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/ext-all.js"></script>
+        <script type = "text/javascript" 
+        src = "https://cdnjs.cloudflare.com/ajax/libs/extjs/6.0.0/classic/locale/locale-tr.js"></script>
+        <script type="text/javascript">
+
+
+
+            Ext.onReady(function () {
+ //kullanıcı getir
+                     Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/getKullanici',
+                    success: function (r) {  
+                         console.log(r.responseText);
+                        Ext.getCmp('kullanici').setText(r.responseText);
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+                
+                // blok getir
+
+                var blok = [];
+
+                //create extjs store with empty data
+                var blokStore = Ext.create('Ext.data.Store', {
+                    fields: ['id', 'blok_ad'],
+                    data: blok,
+                    paging: false
+                });
+
+
+                Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/blokgetir',
+                    success: function (r) {
+
+
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+
+//                        console.log(jsonResp);
+
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            blok.push({'id': jsonResp[i].blok_id, 'blok_ad': jsonResp[i].blok_ad}); ////////  !!!!!!!!!!!!
+                        }
+
+                        blokStore.loadData(blok);
+
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+
+// daire tipi(oda sayısı) getir
+                var dairetipi = [];
+
+                //create extjs store with empty data
+                var dairetipiStore = Ext.create('Ext.data.Store', {
+                    fields: ['id', 'daire_tip_adi'],
+                    data: dairetipi,
+                    paging: false
+                });
+
+
+                Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/dairetipigetir',
+                    success: function (r) {
+
+
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+
+//                        console.log(jsonResp);
+
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            dairetipi.push({'id': jsonResp[i].daire_tipi_id, 'daire_tip_adi': jsonResp[i].daire_tipi}); ////////  !!!!!!!!!!!!
+                        }
+
+                        dairetipiStore.loadData(dairetipi);
+
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+
+// daire durumu (bos dolu )getir
+
+                var dairedurumu = [];
+
+                //create extjs store with empty data
+                var dairedurumuStore = Ext.create('Ext.data.Store', {
+                    fields: ['id', 'daire_durumu'],
+                    data: dairedurumu,
+                    paging: false
+                });
+
+
+                Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/dairedurumugetir',
+                    success: function (r) {
+
+
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+
+//                        console.log(jsonResp);
+
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            dairedurumu.push({'id': jsonResp[i].daire_durumu_id, 'daire_durumu': jsonResp[i].daire_durumu_adi});
+                        }
+
+                        dairedurumuStore.loadData(dairedurumu);
+
+                    },
+                    failure: function (r) {
+                        alert(r);
+                    }
+                });
+
+
+// daire bilgileri grid
+
+                var records = [];
+                //create extjs store with empty data
+                var dairestore = Ext.create('Ext.data.Store', {
+                    fields: ['dairelerim_id', 'bloklar_ad', 'kat_numara', 'daire_numaralar', 'daire_tipi', 'daire_durumu_adi'],
+                    data: records,
+                    paging: false
+                });
+                Ext.Ajax.request({
+                    url: 'http://localhost:8080/SiteYonetim/rest/service/dairebilgilerigetir',
+                    success: function (r) {
+                        //create a json object from the response string
+                        var jsonResp = Ext.decode(r.responseText, true);
+                        // if we have a valid json object, then process it
+                        for (var i = 0; i < jsonResp.length; i++) {
+                            records.push({'dairelerim_id': jsonResp[i].daireler_id, 'bloklar_ad': jsonResp[i].daireblokadi_id, 'kat_numara': jsonResp[i].dairekatno,
+                                'daire_numaralar': jsonResp[i].daireno, 'daire_tipi': jsonResp[i].daire_tipi, 'daire_durumu_adi': jsonResp[i].daire_durumu_adi});
+                        }
+
+                        dairestore.loadData(records);
+                    },
+                    failure: function (r) {
+
+                    }
+                });
+                var dairegridStore = Ext.create('Ext.grid.Panel', {
+                    id: 'gridId',
+                    //renderTo: Ext.getBody(),
+                    store: dairestore,
+                    stripeRows: true,
+                    title: 'Daireler',
+                    width: 'auto',
+                    // collapsible: true,
+                    enableColumnMove: true,
+                    enableColumnResize: true,
+                    //layout: 'fit',
+                    autoScroll: true,
+                    reserveScrollbar: true,
+                    columns:
+                            [
+
+                                {
+                                    header: "Blok Adı",
+                                    dataIndex: 'bloklar_ad',
+                                   // id: 'bloklar_ad',
+                                    flex: .2,
+                                    sortable: true,
+                                    hideable: true
+                                }, {
+                                    header: "Kat Numarası",
+                                    dataIndex: 'kat_numara',
+                                  //  id: 'kat_numara',
+                                    flex: .5,
+                                    sortable: true,
+                                    hideable: false
+                                }, {
+                                    header: "Daire Numarası",
+                                    dataIndex: 'daire_numaralar',
+                                  //  id: 'daire_numaralar',
+                                    flex: .5,
+                                    sortable: true
+                                }, {
+                                    header: "Daire Tipi",
+                                    dataIndex: 'daire_tipi',
+                                  //  id: 'daire_tipi',
+                                    flex: .5,
+                                    sortable: true
+                                }, {
+                                    header: "Daire Durumu",
+                                    dataIndex: 'daire_durumu_adi',
+                                   // id: 'daire_durumu_adi',
+                                    flex: .5,
+                                    sortable: true
+                                }
+                            ],
+                    listeners: {
+                        itemclick: function (dv, record, item, index, e) {
+
+                            Ext.getCmp('dairekat_adi').setValue(record.get('kat_numara')); // ilk değer input id ikinci değer dataIndex değeri
+                            Ext.getCmp('daireno_adi').setValue(record.get('daire_numaralar'));
+                         //  Ext.getCmp('id_daire').setValue(record.get('daire_tip_id')); //işlemi id üzerinden yapıyoruz
+
+
+                            var daireblok_Combo = Ext.getCmp('daireblok_adi'); /// join li combox olunca bu şekilde veriyi alıyoruz
+                            var daireblokstore = daireblok_Combo.getStore();
+
+                                   console.log(daireblokstore.data.items[0]);
+
+                            for (var i = 0; i < daireblokstore.data.items.length; i++) {
+                                if (daireblokstore.data.items[i].data.blok_ad == record.get('bloklar_ad')) {
+                                    Ext.getCmp('daireblok_adi').setRawValue(record.get('bloklar_ad'));
+                                    Ext.getCmp('daireblok_adi').setValue(daireblokstore.data.items[i].data.id);
+                                }
+                            }
+
+                            var dairetipi_Combo = Ext.getCmp('daire_tipi');
+                            var dairetipistore = dairetipi_Combo.getStore();
+
+                                  console.log(dairetipistore.data.items[0]);
+
+                            for (var i = 0; i < dairetipistore.data.items.length; i++) {
+                                if (dairetipistore.data.items[i].data.daire_tip_adi == record.get('daire_tipi')) {
+                                    Ext.getCmp('daire_tipi').setRawValue(record.get('daire_tipi'));
+                                    Ext.getCmp('daire_tipi').setValue(dairetipistore.data.items[i].data.id);//daire durum getir fields id değeri
+                                }
+                            }
+
+                             var d_Combo = Ext.getCmp('daire_durumu_adi');
+                              
+                            var daire_durumstore = d_Combo.getStore();
+
+                                console.log(daire_durumstore.data.items[0]);
+
+                           for (var i = 0; i < daire_durumstore.data.items.length; i++) {
+                               if (daire_durumstore.data.items[i].data.daire_durumu == record.get('daire_durumu_adi')) {
+                                   Ext.getCmp('daire_durumu_adi').setRawValue(record.get('daire_durumu_adi'));
+                                    Ext.getCmp('daire_durumu_adi').setValue(daire_durumstore.data.items[i].data.id);                            
+                                }
+                            }
+
+                           // console.log(record.get('daire_durumlar'));
+
+
+
+                        }
+                    },
+
+                    dockedItems: [{
+                            xtype: 'pagingtoolbar',
+                            store: dairegridStore, // same store GridPanel is using
+                            dock: 'bottom'
+                                    // displayInfo: true
+                        }]
+                });
+
+//daire form 
+                var daireler = Ext.create('Ext.form.Panel', {
+                    id: 'daire',
+                    border: true,
+                    width: 'auto',
+                    title: 'DAİRELER',
+                    items: [
+                        {
+                            xtype: 'hiddenfield',
+                            name: 'id_daire',
+                            id: 'id_daire',
+                            width: 350,
+                            margin: '5 0 0 5'
+                        },
+                        {
+                            xtype: 'combobox',
+                            fieldLabel: 'BLOK ADI:',
+                            name: 'daireblok_adi',
+                            id: 'daireblok_adi',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            queryMode: 'local',
+                            store: blokStore,
+                            displayField: 'blok_ad', // get-set alanında geliyor
+                            valueField: 'id'
+                            
+                        },
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'KAT NO:',
+                            name: 'dairekat_adi',
+                            id: 'dairekat_adi',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            maskRe: /[0-9]/,
+                            validator: function (v) {
+                                return /^-?[0-9]*(\.[0-9]{1,2})?$/.test(v) ? true : '';
+                            }
+                        },
+                        {
+                            xtype: 'textfield',
+                            fieldLabel: 'DAİRE NO:',
+                            name: 'daireno_adi',
+                            id: 'daireno_adi',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            allowNegative: false,
+                            allowDecimals: false,
+                            // allowBlank: false,
+                            maskRe: /[0-9]/,
+                            validator: function (v) {
+                                return /^-?[0-9]*(\.[0-9]{1,2})?$/.test(v) ? true : '';
+                            }
+                        }, {
+                            xtype: 'combobox',
+                            fieldLabel: 'DAİRE TİPİ:',
+                            name: 'daire_tipi',
+                            id: 'daire_tipi',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            queryMode: 'local',
+                            store: dairetipiStore,
+                            displayField: 'daire_tip_adi', // get-set alanında geliyor
+                            valueField: 'daire_tip_id' // 
+
+                        },
+                        {
+                            xtype: 'combobox',
+                            fieldLabel: 'DAİRE DURUMU:',
+                            name: 'daire_durumu_adi',
+                            id: 'daire_durumu_adi',
+                            width: 350,
+                            margin: '5 0 5 5',
+                            queryMode: 'local',
+                            store: dairedurumuStore,
+                            displayField: 'daire_durumu', // get-set alanında geliyor
+                            valueField: 'daire_durum_id'
+                        },
+                        {
+                            xtype: 'button',
+                            text: 'Ekle',
+                            id: 'daire_ekle',
+                            width: 100,
+                            margin: '5 0 5 5',
+                            listeners: {//Implement listener
+                                click: function () {
+                                    var form = Ext.getCmp('daire');
+                                    var values = form.getValues(); //get values from form id
+                                    console.log(values);
+                                    Ext.Ajax.request({
+                                        url: 'http://localhost:8080/SiteYonetim/rest/service/dairekaydet', //Defined path of function defined in MVC 
+                                        method: 'POST',
+                                        params: {
+                                            daireblok_adi: values.daireblok_adi, // sağdaki değişken input NAME ile aynı olmalı soldaki isim form param ile aynı olmalı
+                                            dairekat_adi: values.dairekat_adi,
+                                            daireno_adi: values.daireno_adi,
+                                            daire_tipi: values.daire_tipi,
+                                            dairedurumu_adi: values.daire_durumu_adi
+                                        },
+                                        success: function () {
+                                            alert('Kayit Başarılı');
+                                            // location.reload();
+                                        },
+                                        failure: function () {
+                                            alert('Veri tabanına bağlanılmadı');
+                                        }
+
+                                    });
+                                }
+                            }
+                        },
+                        {
+                            xtype: 'button',
+                            text: 'Güncelle',
+                            id: 'daireler_guncelle',
+                            width: 100,
+                            margin: '5 0 5 5',
+                            listeners: {//Implement listener
+                                click: function () {
+                                    var form = Ext.getCmp('daire');
+                                    var values = form.getValues(); //get values from form id
+                                    console.log(values);
+                                    Ext.Ajax.request({
+                                        url: 'http://localhost:8080/SiteYonetim/rest/service/daireguncelle', //Defined path of function defined in MVC 
+                                        method: 'POST',
+                                        params: {
+                                            id_daire:values.id_daire,
+                                            daireblok_adi: values.daireblok_adi, // sağdaki değişken input NAME ile aynı olmalı soldaki isim form param ile aynı olmalı
+                                            dairekat_adi: values.dairekat_adi,
+                                            daireno_adi: values.daireno_adi,
+                                            dairetipi_adi: values.dairetipi_adi,
+                                            dairedurumu_adi: values.dairedurumu_adi
+                                        },
+                                        success: function () {
+                                            alert('Kayit Başarılı');
+                                            location.reload();
+                                        },
+                                        failure: function () {
+                                            alert('Veri tabanına bağlanılmadı');
+                                        }
+
+                                    });
+                                }
+                            }
+                        }
+                    ]
+
+                });
+
+// panel birleştirme
+                Ext.create('Ext.panel.Panel', {
+                    layout: 'border',
+                    width: 'auto',
+                    height: 950,
+                    renderTo: Ext.getBody(),
+                    items: [
+                        {
+                            xtype: 'panel',
+                            // html: 'North Panel',
+                            region: 'north',
+                            height: 65,
+                            layout: 'hbox',
+                            items: [
+                                {
+                                    xtype: 'button',
+                                    text: 'ANASAYFA',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./index.html";
+                                    }
+                                }, {
+                                    xtype: 'button',
+                                    text: 'SİTELER',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./site.html";
+                                    }
+                                }, {
+                                    xtype: 'button',
+                                    text: 'BLOKLAR',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./blok.html";
+                                    }
+                                }, {
+                                    xtype: 'button',
+                                    text: 'DAİRELER',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 5 5',
+                                    handler: function () {
+                                        window.location = "./daire.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'SİTE SAKİNLERİ',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./sitesakinleri.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'AİDATLAR',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./aidat.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'KİRALAR',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./kira.html";
+                                    }
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'GÖREVLİLER',
+                                    width: 120,
+                                    height: 50,
+                                    margin: '5 15 15 5',
+                                    handler: function () {
+                                        window.location = "./gorevli.html";
+                                    }
+                                }, {
+                                    xtype: 'label',
+                                    margin: '5 15 15 550',
+                                    id: 'kullanici',
+                                    name: 'kullanici',
+                                   style:'color: #0000cd; font-weight: bold; font-size: 14px'
+                                },
+                                {
+                                    xtype: 'button',
+                                    text: 'Çıkış',
+                                    margin: '10 15 15 15',
+                                    id: 'cikis',
+                                    name: 'cikis',
+                                    width: 100,
+                                    handler: function cikis() {
+                                        var theUrl = "http://localhost:8080/SiteYonetim/rest/service/cikis";
+                                        var xmlHttp = new XMLHttpRequest();
+                                        xmlHttp.onreadystatechange = function () {
+                                            if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+                                                window.location="./login.html";
+                                            }
+                                        };
+                                        xmlHttp.open("POST", theUrl, true); // true for asynchronous 
+                                        xmlHttp.send(null);
+                                    }
+
+                                }
+                            ]
+
+
+                        }, {
+                            xtype: 'panel',
+                            region: 'center',
+                            width: 'auto',
+                            height: 500,
+                            items: [dairegridStore]
+                        },
+                        {
+                            xtype: 'panel',
+                            region: 'west',
+                            border: true,
+                            width: 500,
+                            autoScroll: true,
+                            items: [daireler]
+
+                        }
+                    ]
+                });
+            });
+
+        </script>
+    </head>
+    <body>
+        <div></div>
+    </body>
+</html>
