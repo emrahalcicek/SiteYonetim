@@ -12,11 +12,11 @@ public class Database {
 
   public static Connection getConnection() throws SQLException{
 		Connection connection = null;
-		String connectionURL = "jdbc:oracle:thin:@10.6.10.5:1521:FONET";
+		String connectionURL = "jdbc:oracle:thin:localhost:port:dbName";
 		try {
 			
 			Class.forName("oracle.jdbc.driver.OracleDriver").newInstance();
-			connection = DriverManager.getConnection(connectionURL, "STAJYER3", "emrah2323");
+			connection = DriverManager.getConnection(connectionURL, "dbusername", "password");
                         
                         System.out.println("Ok!");
 
